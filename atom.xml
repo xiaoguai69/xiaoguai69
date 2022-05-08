@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://xiaoguai69.github.io</id>
+    <title>xiaoguai</title>
+    <updated>2022-05-08T04:48:03.965Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://xiaoguai69.github.io"/>
+    <link rel="self" href="https://xiaoguai69.github.io/atom.xml"/>
+    <subtitle>玛卡巴卡</subtitle>
+    <logo>https://xiaoguai69.github.io/images/avatar.png</logo>
+    <icon>https://xiaoguai69.github.io/favicon.ico</icon>
+    <rights>All rights reserved 2022, xiaoguai</rights>
+    <entry>
+        <title type="html"><![CDATA[😍渗透基础总结]]></title>
+        <id>https://xiaoguai69.github.io/post/渗透基础总结/</id>
+        <link href="https://xiaoguai69.github.io/post/渗透基础总结/">
+        </link>
+        <updated>2022-05-08T02:34:48.000Z</updated>
+    </entry>
+</feed>
