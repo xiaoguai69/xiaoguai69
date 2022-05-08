@@ -3,7 +3,7 @@
     <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>😍渗透基础总结 | xiaoguai</title>
-<link rel="shortcut icon" href="https://xiaoguai69.github.io/favicon.ico?v=1652018887575">
+<link rel="shortcut icon" href="https://xiaoguai69.github.io/favicon.ico?v=1652019260819">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://xiaoguai69.github.io/styles/main.css">
 <link rel="alternate" type="application/atom+xml" title="😍渗透基础总结 | xiaoguai - Atom Feed" href="https://xiaoguai69.github.io/atom.xml">
@@ -26,7 +26,7 @@ create da..." />
       <div class="main-content">
         <div class="site-header">
   <a href="https://xiaoguai69.github.io">
-  <img class="avatar" src="https://xiaoguai69.github.io/images/avatar.png?v=1652018887575" alt="">
+  <img class="avatar" src="https://xiaoguai69.github.io/images/avatar.png?v=1652019260819" alt="">
   </a>
   <h1 class="site-title">
     xiaoguai
@@ -98,6 +98,8 @@ create da..." />
                 </a>
               
             </div>
+            
+              <img class="post-feature-image" src="https://xiaoguai69.github.io/post-images/渗透基础总结.png" alt="">
             
             <div class="post-content-wrapper">
               <div class="post-content">
@@ -175,6 +177,7 @@ substring(&quot;string&quot;,strart,length)
 常用语句
 
 </code></pre>
+<!-- more -->
 <h5 id="3-联合注入union-query-sql-injection">3、联合注入（Union query SQL injection）</h5>
 <p>过程：</p>
 <h5 id="4-多语句查询注入stacted-queries-sql-injection">4、多语句查询注入（Stacted queries SQL injection）</h5>
@@ -204,7 +207,8 @@ substring(&quot;string&quot;,strart,length)
 5.获取数据库中的表<br>
 6.获取表中的字段名<br>
 7.显示字段信息</p>
-<figure data-type="image" tabindex="1"><img src="./images/%E5%9F%BA%E7%A1%80%E6%80%BB%E7%BB%93/1.png" alt="img" loading="lazy"></figure>
+<p><img src="./images/%E5%9F%BA%E7%A1%80%E6%80%BB%E7%BB%93/1.png" alt="img" loading="lazy"><br>
+<img src="https://xiaoguai69.github.io/post-images/1652019237020.png" alt="" loading="lazy"></p>
 <h3 id="2-复现">2、复现</h3>
 <p>基于DVWA</p>
 <h4 id="1-首先-判断是否存在注入存在的注入点是字符型和数字型">1、首先 判断是否存在注入，存在的注入点是字符型和数字型</h4>
@@ -449,7 +453,7 @@ substring(&quot;string&quot;,strart,length)
 
 </code></pre>
 <p><strong>方法四：使用burp</strong></p>
-<figure data-type="image" tabindex="2"><img src="./images/%E5%9F%BA%E7%A1%80%E6%80%BB%E7%BB%93%5Cburp-sql.jpg" alt="4" loading="lazy"></figure>
+<figure data-type="image" tabindex="1"><img src="./images/%E5%9F%BA%E7%A1%80%E6%80%BB%E7%BB%93%5Cburp-sql.jpg" alt="4" loading="lazy"></figure>
 <p>4.判断表个数</p>
 <p>count()函数是用来统计表中记录的一个函数，返回匹配条件的行数。</p>
 <pre><code class="language-sql">?id=1' and (select count(table_name) from information_schema.tables where table_schema=database())&gt;0 --+ 
@@ -1002,7 +1006,7 @@ gongji方式：用户请求一个经过专门设计的链接，由gongji者提�
 <p>一般来说我们使用<script>alert(/xss/)</script>来报xss弹窗</p>
 <p>但是我们在测试时发现pikachu，限制了我们输入的长度</p>
 <p>我们只需要F12，定位修改一下长度即可</p>
-<figure data-type="image" tabindex="3"><img src="./images/%E5%9F%BA%E7%A1%80%E6%80%BB%E7%BB%93%5Cxss-1.png" alt="xss" loading="lazy"></figure>
+<figure data-type="image" tabindex="2"><img src="./images/%E5%9F%BA%E7%A1%80%E6%80%BB%E7%BB%93%5Cxss-1.png" alt="xss" loading="lazy"></figure>
 <h4 id="2-存储型">2、存储型</h4>
 <p>会一直存在与代码当中，一直访问一直有</p>
 <p>我们只需要在留言板中输入payload即可</p>
@@ -1019,12 +1023,12 @@ DOM 型 XSS 攻击中，取出和执行恶意代码都由浏览器端完成，�
 <p>举例：</p>
 <p>下面是一个物流详情的页面，在 URL 上有快递编号这个参数，通过这个参数来获取数据。</p>
 <p>https://www.kkkk1000.com/xss/dom/index.html?serialNumber=YT40359134268305</p>
-<figure data-type="image" tabindex="4"><img src="./images/%E5%9F%BA%E7%A1%80%E6%80%BB%E7%BB%93%5CXSS-dom-1.png" alt="img" loading="lazy"></figure>
+<figure data-type="image" tabindex="3"><img src="./images/%E5%9F%BA%E7%A1%80%E6%80%BB%E7%BB%93%5CXSS-dom-1.png" alt="img" loading="lazy"></figure>
 <p>因为在源码中可以看到，页面上显示的快递编号，是直接取的 URL 上的参数显示的。所以我们构造这样一个网址：</p>
 <pre><code>https://www.kkkk1000.com/xss/dom/index.html?serialNumber=alert(&quot;xss&quot;)
 </code></pre>
 <p>然后诱导他人点击这个链接，就可以完成一次 DOM 型 XSS 攻击。</p>
-<figure data-type="image" tabindex="5"><img src="./images/%E5%9F%BA%E7%A1%80%E6%80%BB%E7%BB%93%5CXSS-dom-2.png" alt="img" loading="lazy"></figure>
+<figure data-type="image" tabindex="4"><img src="./images/%E5%9F%BA%E7%A1%80%E6%80%BB%E7%BB%93%5CXSS-dom-2.png" alt="img" loading="lazy"></figure>
 <h4 id="4-xss盲打">4、XSS盲打</h4>
 <h4 id="5-xss过滤">5、XSS过滤</h4>
 <h4 id="6-xss之htmlspecialchars">6、<strong>xss之htmlspecialchars</strong></h4>

